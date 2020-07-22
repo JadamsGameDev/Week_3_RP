@@ -16,7 +16,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             public float StrafeSpeed = 4.0f;    // Speed when walking sideways
             public float RunMultiplier = 2.0f;   // Speed when sprinting
 	        public KeyCode RunKey = KeyCode.LeftShift;
-            public float JumpForce = 30f;
+            public float JumpForce = 5f;     //30f - default
             public AnimationCurve SlopeCurveModifier = new AnimationCurve(new Keyframe(-90.0f, 1.0f), new Keyframe(0.0f, 1.0f), new Keyframe(90.0f, 0.0f));
             [HideInInspector] public float CurrentTargetSpeed = 8f;
 
@@ -143,8 +143,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
             GroundCheck();
             Vector2 input = GetInput();
 
+            // if input is detected on the horizontal or vertical axes and the player is on the ground or can move in the air then change the force acting on the rigidbody
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
             {
+                // the desiredMove vector direction the player wants to move in is the direction of a vector created by the camera direction
+                // before applying magnitude to the desiredMove vector, the vector must be applied to the world by getting its location on a plane that represents the
+                // ground / bottom of the world. this is normalised as to not effect the magnitude calculations. the magnitude of the desiredMove vector is equal to itself
+                // multiplied by the speed of the players current movement type. the desiredMove force is only applied to the rigidbody if the velocity's speed/magnitude 
+                // does not exceed the max speed.
+
                 // always move along the camera forward as it is the direction that it being aimed at
                 Vector3 desiredMove = cam.transform.forward*input.y + cam.transform.right*input.x;
                 desiredMove = Vector3.ProjectOnPlane(desiredMove, m_GroundContactNormal).normalized;
@@ -159,6 +166,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
             }
 
+            // if the player is on the ground, a drag force is applied, if not, the drag force is removed
             if (m_IsGrounded)
             {
                 m_RigidBody.drag = 5f;
