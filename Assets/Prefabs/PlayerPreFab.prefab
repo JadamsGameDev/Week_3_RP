@@ -204,7 +204,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3437871919198888492}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81c9795a96c094f4cbde4d65546aa9b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 22f86d0cc3b16024ea7acd69c933f3af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 7453425552361805285}
@@ -264,3 +264,5 @@ MonoBehaviour:
     slowDownRate: 20
     airControl: 0
     shellOffset: 0
+  gripPrefab: {fileID: 6689733929751188278, guid: afbdc143040794b4dac4c852243c2ae5,
+    type: 3}

@@ -82,7 +82,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public MouseLook mouseLook = new MouseLook();
         public AdvancedSettings advancedSettings = new AdvancedSettings();
 
-        public GameObject gripPrefab;
+        public GameObject gripPrefab;  // prefab of the grip object
 
 
         private Rigidbody m_RigidBody;
@@ -91,8 +91,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 m_GroundContactNormal;
         private bool m_Jump, m_PreviouslyGrounded, m_Jumping, m_IsGrounded;
 
+
         // variables holding data regarding the grip spawning and sphere cast for the grips
         private bool m_doesGripTraceExist, m_canStartGripTrace;
+        private bool m_isHanging;  // is the player hanging from a grip
 
 
         public Vector3 Velocity
@@ -187,6 +189,22 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 if (!m_Jumping && Mathf.Abs(input.x) < float.Epsilon && Mathf.Abs(input.y) < float.Epsilon && m_RigidBody.velocity.magnitude < 1f)
                 {
                     m_RigidBody.Sleep();
+                }
+            }
+            else if (m_isHanging)
+            {
+                Vector3 desiredJump = cam.transform.forward + cam.transform.right + cam.transform.up;
+                desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
+
+                desiredJump.x = desiredJump.x * movementSettings.JumpForce;
+                desiredJump.y = desiredJump.y * movementSettings.JumpForce;
+                desiredJump.z = desiredJump.z * movementSettings.JumpForce;
+
+                if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.JumpForce * movementSettings.JumpForce)) && m_Jump)
+                {
+                    m_RigidBody.drag = 0f;
+                    m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
+                    m_Jumping = true;
                 }
             }
             else
@@ -289,7 +307,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_IsGrounded = false;
                 m_GroundContactNormal = Vector3.up;
             }
-            if (!m_PreviouslyGrounded && m_IsGrounded && m_Jumping)
+            if (!m_PreviouslyGrounded && (m_IsGrounded || m_isHanging) && m_Jumping)
             {
                 m_Jumping = false;
             }
@@ -307,6 +325,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_doesGripTraceExist = false;
             m_canStartGripTrace = true;
+        }
+
+        public void setHang(bool isHang)
+        {
+            m_isHanging = isHang;
+
+            // if hanging, set location to point of collision
+            // above is done in grip script
         }
     }
 }
