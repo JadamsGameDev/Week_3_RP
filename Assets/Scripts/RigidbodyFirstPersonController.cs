@@ -82,12 +82,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public MouseLook mouseLook = new MouseLook();
         public AdvancedSettings advancedSettings = new AdvancedSettings();
 
+        public GameObject gripPrefab;
+
 
         private Rigidbody m_RigidBody;
         private CapsuleCollider m_Capsule;
         private float m_YRotation;
         private Vector3 m_GroundContactNormal;
         private bool m_Jump, m_PreviouslyGrounded, m_Jumping, m_IsGrounded;
+
+        // variables holding data regarding the grip spawning and sphere cast for the grips
+        private bool m_doesGripTraceExist, m_canStartGripTrace;
 
 
         public Vector3 Velocity
@@ -193,6 +198,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
             }
             m_Jump = false;
+
+            // if the left mouse button is pressed down and there is no sphere trace for the grip,
+            // allow sphere traces for the grip to start
+            if (Input.GetKeyDown(KeyCode.Mouse0) && !m_doesGripTraceExist)
+            {
+                m_canStartGripTrace = true;
+            }
+
+            // if the left mouse button is released and a sphere trace for the grip can start,
+            // start the grip trace
+            if(Input.GetKeyUp(KeyCode.Mouse0) && m_canStartGripTrace)
+            {
+                m_doesGripTraceExist = true;
+                m_canStartGripTrace = false;
+
+                SpawnGrip();
+            }
         }
 
 
@@ -271,6 +293,20 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_Jumping = false;
             }
+        }
+
+        private void SpawnGrip()
+        {
+            float gripRadius = (gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+            RaycastHit hitInfoGrip;
+            if(Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+            {
+                GameObject gripObject = Instantiate(gripPrefab);
+                gripObject.transform.position = hitInfoGrip.point;
+            }
+
+            m_doesGripTraceExist = false;
+            m_canStartGripTrace = true;
         }
     }
 }
