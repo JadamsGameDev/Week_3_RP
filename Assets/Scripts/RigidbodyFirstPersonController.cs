@@ -219,9 +219,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             // if the left mouse button is pressed down and there is no sphere trace for the grip,
             // allow sphere traces for the grip to start
-            if (Input.GetKeyDown(KeyCode.Mouse0) && !m_doesGripTraceExist)
+            if (Input.GetKeyDown(KeyCode.Mouse0) && (m_doesGripTraceExist == false))
             {
                 m_canStartGripTrace = true;
+                m_doesGripTraceExist = true;
             }
 
             // if the left mouse button is released and a sphere trace for the grip can start,
