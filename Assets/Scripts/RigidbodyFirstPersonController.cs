@@ -151,6 +151,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Jump = true;
             }
 
+            Debug.Log(ObjLimit);
+
         }
 
 
@@ -158,7 +160,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             GroundCheck();
             Vector2 input = GetInput();
-            Debug.Log(input);
 
             // if input is detected on the horizontal or vertical axes and the player is on the ground or can move in the air then change the force acting on the rigidbody
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
@@ -186,7 +187,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // if the player is on the ground, a drag force is applied, if not, the drag force is removed
             if (m_IsGrounded)
             {
-                m_RigidBody.drag = 5f;
+                m_RigidBody.drag = 7f;
 
                 if (m_Jump)
                 {
@@ -357,19 +358,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
                         //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
-                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
-                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.collider.transform.forward;
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);//(hitInfoGrip.collider.transform.forward * 0.6f);
+                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.normal;
                         gripObject.transform.position = hitInfoGrip.point;
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
-
                         //Debug.Log(cam.transform.forward);
                     }
                     else if (hitInfoGrip.collider.tag == "Grip")
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
-                        jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        //jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        jumpPadObject.transform.forward = hitInfoGrip.normal;
                         jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
-                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
 
@@ -378,9 +379,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject dashObject = Instantiate(dashPrefab);
-                        dashObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        dashObject.transform.forward = hitInfoGrip.normal;
                         dashObject.transform.position = hitInfoGrip.collider.transform.position;
-                        dashObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        dashObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
 
@@ -410,8 +411,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
-                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
-                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.collider.transform.forward;
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);//(hitInfoGrip.collider.transform.forward * 0.6f);
+                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.normal;
                         gripObject.transform.position = hitInfoGrip.point;
 
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
@@ -421,9 +422,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if(hitInfoGrip.collider.tag == "Dash")
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
-                        jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        jumpPadObject.transform.forward = hitInfoGrip.normal;
                         jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
-                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
                         jumpPadObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
 
