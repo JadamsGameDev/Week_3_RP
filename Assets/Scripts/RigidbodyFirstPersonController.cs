@@ -149,7 +149,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
-            Debug.Log("Cam Forward Direction: " + cam.transform.forward);
+            Debug.Log(m_isHanging);
 
             GroundCheck();
             Vector2 input = GetInput();
@@ -197,14 +197,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else if (m_isHanging)
             {
-                Vector3 desiredJump = cam.transform.forward + cam.transform.right + cam.transform.up;
+                Vector3 desiredJump = cam.transform.right + cam.transform.up;
                 desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
 
                 desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
                 desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
                 //desiredJump.z = desiredJump.z * movementSettings.JumpForce;
 
-                if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.JumpForce * movementSettings.JumpForce)) && m_Jump)
+                if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY)) && m_Jump)
                 {
                     m_RigidBody.drag = 0f;
                     m_RigidBody.useGravity = true;

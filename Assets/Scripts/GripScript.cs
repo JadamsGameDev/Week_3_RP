@@ -21,14 +21,11 @@ public class GripScript : MonoBehaviour
     {
        if(other.tag == "Player")
         {
-            other.transform.position = transform.position;
-            other.attachedRigidbody.useGravity = false;
-            //other.attachedRigidbody.velocity = new Vector3(0f, 0f, 0f);
             other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
-        }
-       else if(other.tag == "Wall")
-        {
-
+            float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
+            other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight + 0.1f), transform.position.z);
+            //other.attachedRigidbody.useGravity = false;
+            other.attachedRigidbody.velocity = new Vector3(0f, 0f, 0f);
         }
     }
 
@@ -38,8 +35,8 @@ public class GripScript : MonoBehaviour
         {
             if (other.GetComponent<RigidbodyFirstPersonController>().Jumping == false)
             {
-                other.transform.position = transform.position;
-                other.attachedRigidbody.useGravity = false;
+                //other.transform.position = transform.position;
+                //other.attachedRigidbody.useGravity = false;
             }
             else
             {
@@ -54,7 +51,7 @@ public class GripScript : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            other.attachedRigidbody.useGravity = true;
+            //other.attachedRigidbody.useGravity = true;
             other.GetComponent<RigidbodyFirstPersonController>().setHang(false);
         }
     }
