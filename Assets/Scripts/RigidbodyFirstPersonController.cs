@@ -158,6 +158,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             GroundCheck();
             Vector2 input = GetInput();
+            Debug.Log(input);
 
             // if input is detected on the horizontal or vertical axes and the player is on the ground or can move in the air then change the force acting on the rigidbody
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
