@@ -349,7 +349,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             if (ObjLimit < 5)
             {
-                float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                float gripRadius = 0.25f;//(gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
                 RaycastHit hitInfoGrip;
                 if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
                 {
@@ -358,9 +358,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
                         //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
-                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);//(hitInfoGrip.collider.transform.forward * 0.6f);
-                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.normal;
-                        gripObject.transform.position = hitInfoGrip.point;
+                        gripObject.transform.forward = hitInfoGrip.normal;
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
+                        gripObject.transform.position = hitInfoGrip.point + hitInfoGrip.normal;
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
                         //Debug.Log(cam.transform.forward);
                     }
@@ -368,7 +368,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
                         //jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
-                        jumpPadObject.transform.forward = hitInfoGrip.normal;
+                        jumpPadObject.transform.up = hitInfoGrip.normal;
                         jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
                         jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
@@ -379,7 +379,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject dashObject = Instantiate(dashPrefab);
-                        dashObject.transform.forward = hitInfoGrip.normal;
+                        dashObject.transform.up = hitInfoGrip.normal;
                         dashObject.transform.position = hitInfoGrip.collider.transform.position;
                         dashObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
@@ -411,9 +411,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
-                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);//(hitInfoGrip.collider.transform.forward * 0.6f);
-                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.normal;
-                        gripObject.transform.position = hitInfoGrip.point;
+                        gripObject.transform.forward = hitInfoGrip.normal;
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
+                        gripObject.transform.position = hitInfoGrip.point + hitInfoGrip.normal;
 
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
 
@@ -422,7 +422,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if(hitInfoGrip.collider.tag == "Dash")
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
-                        jumpPadObject.transform.forward = hitInfoGrip.normal;
+                        jumpPadObject.transform.up = hitInfoGrip.normal;
                         jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
                         jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
