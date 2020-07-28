@@ -90,7 +90,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7d06d87754e36874a8b1ebce710a84bb, type: 2}
+  - {fileID: 2100000, guid: 03317c18ce1cfb44d9850424b21de993, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,8 +133,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 7884073716922739489}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: baf16ea36e0266a40b6180460e2ec987, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c293edf308f728499ef872e37ac7492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_JumpPadPrefab: {fileID: 8141056665097495129, guid: a9370888ab0f02d489723bd6fa8eb027,
+  m_JumpPadPrefab: {fileID: 8141056665097495129, guid: b43d701bb1a9afb4eb4ac6101343bc8e,
     type: 3}
