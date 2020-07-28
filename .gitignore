@@ -33,3 +33,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 *.meta
+ProjectSettings/QualitySettings.asset
+ProjectSettings/UnityConnectSettings.asset
