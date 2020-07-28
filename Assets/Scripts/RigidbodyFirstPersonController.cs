@@ -17,6 +17,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             public float RunMultiplier = 2.0f;   // Speed when sprinting
 	        public KeyCode RunKey = KeyCode.LeftShift;
             public float JumpForce = 5f;     //30f - default
+            public float jumpForceHangY = 10f;
+            public float jumpForceHangX = 10f;
             public AnimationCurve SlopeCurveModifier = new AnimationCurve(new Keyframe(-90.0f, 1.0f), new Keyframe(0.0f, 1.0f), new Keyframe(90.0f, 0.0f));
             [HideInInspector] public float CurrentTargetSpeed = 8f;
 
@@ -147,6 +149,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
+            Debug.Log("Cam Forward Direction: " + cam.transform.forward);
+
             GroundCheck();
             Vector2 input = GetInput();
 
@@ -196,13 +200,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 Vector3 desiredJump = cam.transform.forward + cam.transform.right + cam.transform.up;
                 desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
 
-                desiredJump.x = desiredJump.x * movementSettings.JumpForce;
-                desiredJump.y = desiredJump.y * movementSettings.JumpForce;
-                desiredJump.z = desiredJump.z * movementSettings.JumpForce;
+                desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
+                desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
+                //desiredJump.z = desiredJump.z * movementSettings.JumpForce;
 
                 if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.JumpForce * movementSettings.JumpForce)) && m_Jump)
                 {
                     m_RigidBody.drag = 0f;
+                    m_RigidBody.useGravity = true;
                     m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
                     m_Jumping = true;
                 }
@@ -316,11 +321,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void SpawnGrip()
         {
-            float gripRadius = (gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+            float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
             RaycastHit hitInfoGrip;
             if(Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
             {
                 GameObject gripObject = Instantiate(gripPrefab);
+                gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward* -0.5f);
                 gripObject.transform.position = hitInfoGrip.point;
             }
 
