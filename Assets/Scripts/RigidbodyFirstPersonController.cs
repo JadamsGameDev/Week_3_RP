@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
-    [RequireComponent(typeof (Rigidbody))]
-    [RequireComponent(typeof (CapsuleCollider))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(CapsuleCollider))]
     public class RigidbodyFirstPersonController : MonoBehaviour
     {
         [Serializable]
@@ -15,7 +15,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             public float BackwardSpeed = 4.0f;  // Speed when walking backwards
             public float StrafeSpeed = 4.0f;    // Speed when walking sideways
             public float RunMultiplier = 2.0f;   // Speed when sprinting
-	        public KeyCode RunKey = KeyCode.LeftShift;
+            public KeyCode RunKey = KeyCode.LeftShift;
             public float JumpForce = 5f;     //30f - default
             public float jumpForceHangY = 10f;
             public float jumpForceHangX = 7f;
@@ -28,33 +28,33 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             public void UpdateDesiredTargetSpeed(Vector2 input)
             {
-	            if (input == Vector2.zero) return;
-				if (input.x > 0 || input.x < 0)
-				{
-					//strafe
-					CurrentTargetSpeed = StrafeSpeed;
-				}
-				if (input.y < 0)
-				{
-					//backwards
-					CurrentTargetSpeed = BackwardSpeed;
-				}
-				if (input.y > 0)
-				{
-					//forwards
-					//handled last as if strafing and moving forward at the same time forwards speed should take precedence
-					CurrentTargetSpeed = ForwardSpeed;
-				}
+                if (input == Vector2.zero) return;
+                if (input.x > 0 || input.x < 0)
+                {
+                    //strafe
+                    CurrentTargetSpeed = StrafeSpeed;
+                }
+                if (input.y < 0)
+                {
+                    //backwards
+                    CurrentTargetSpeed = BackwardSpeed;
+                }
+                if (input.y > 0)
+                {
+                    //forwards
+                    //handled last as if strafing and moving forward at the same time forwards speed should take precedence
+                    CurrentTargetSpeed = ForwardSpeed;
+                }
 #if !MOBILE_INPUT
-	            if (Input.GetKey(RunKey))
-	            {
-		            CurrentTargetSpeed *= RunMultiplier;
-		            m_Running = true;
-	            }
-	            else
-	            {
-		            m_Running = false;
-	            }
+                if (Input.GetKey(RunKey))
+                {
+                    CurrentTargetSpeed *= RunMultiplier;
+                    m_Running = true;
+                }
+                else
+                {
+                    m_Running = false;
+                }
 #endif
             }
 
@@ -85,6 +85,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public AdvancedSettings advancedSettings = new AdvancedSettings();
 
         public GameObject gripPrefab;  // prefab of the grip object
+        public int ObjLimit = 0;    //Spawn object limiter
+
         public GameObject jumpPrefab;  // prefab of the jump pad object
 
 
@@ -96,7 +98,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 
         // variables holding data regarding the grip spawning and sphere cast for the grips
-        private bool m_doesGripTraceExist, m_canStartGripTrace;
+        private bool m_LeftDoesGripTraceExist, m_LeftCanStartGripTrace;
+
+        //Variables holding data regarding the grip despawning and sphere cast for the grips
+        private bool m_RightDoesGripTraceExist, m_RightCanStartGripTrace;
+
         private bool m_isHanging;  // is the player hanging from a grip
 
 
@@ -119,8 +125,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             get
             {
- #if !MOBILE_INPUT
-				return movementSettings.Running;
+#if !MOBILE_INPUT
+                return movementSettings.Running;
 #else
 	            return false;
 #endif
@@ -132,7 +138,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_RigidBody = GetComponent<Rigidbody>();
             m_Capsule = GetComponent<CapsuleCollider>();
-            mouseLook.Init (transform, cam.transform);
+            mouseLook.Init(transform, cam.transform);
         }
 
 
@@ -163,16 +169,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 // does not exceed the max speed.
 
                 // always move along the camera forward as it is the direction that it being aimed at
-                Vector3 desiredMove = cam.transform.forward*input.y + cam.transform.right*input.x;
+                Vector3 desiredMove = cam.transform.forward * input.y + cam.transform.right * input.x;
                 desiredMove = Vector3.ProjectOnPlane(desiredMove, m_GroundContactNormal).normalized;
 
-                desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed;
-                desiredMove.z = desiredMove.z*movementSettings.CurrentTargetSpeed;
-                desiredMove.y = desiredMove.y*movementSettings.CurrentTargetSpeed;
+                desiredMove.x = desiredMove.x * movementSettings.CurrentTargetSpeed;
+                desiredMove.z = desiredMove.z * movementSettings.CurrentTargetSpeed;
+                desiredMove.y = desiredMove.y * movementSettings.CurrentTargetSpeed;
                 if (m_RigidBody.velocity.sqrMagnitude <
-                    (movementSettings.CurrentTargetSpeed*movementSettings.CurrentTargetSpeed))
+                    (movementSettings.CurrentTargetSpeed * movementSettings.CurrentTargetSpeed))
                 {
-                    m_RigidBody.AddForce(desiredMove*SlopeMultiplier(), ForceMode.Impulse);
+                    m_RigidBody.AddForce(desiredMove * SlopeMultiplier(), ForceMode.Impulse);
                 }
             }
 
@@ -224,20 +230,38 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             // if the left mouse button is pressed down and there is no sphere trace for the grip,
             // allow sphere traces for the grip to start
-            if (Input.GetKeyDown(KeyCode.Mouse0) && (m_doesGripTraceExist == false))
+            if (Input.GetKeyDown(KeyCode.Mouse0) && (m_LeftDoesGripTraceExist == false))
             {
-                m_canStartGripTrace = true;
-                m_doesGripTraceExist = true;
+                m_LeftCanStartGripTrace = true;
+                m_LeftDoesGripTraceExist = true;
             }
 
             // if the left mouse button is released and a sphere trace for the grip can start,
             // start the grip trace
-            if(Input.GetKeyUp(KeyCode.Mouse0) && m_canStartGripTrace)
+            if (Input.GetKeyUp(KeyCode.Mouse0) && m_LeftCanStartGripTrace)
             {
-                m_doesGripTraceExist = true;
-                m_canStartGripTrace = false;
+                m_LeftDoesGripTraceExist = true;
+                m_LeftCanStartGripTrace = false;
 
                 SpawnGrip();
+            }
+
+            // if the left mouse button is pressed down and there is no sphere trace for the grip,
+            // allow sphere traces for the grip to start
+            if (Input.GetKeyDown(KeyCode.Mouse1) && (m_RightDoesGripTraceExist == false))
+            {
+                m_RightCanStartGripTrace = true;
+                m_RightDoesGripTraceExist = true;
+            }
+
+            // if the left mouse button is released and a sphere trace for the grip can start,
+            // start the grip trace
+            if (Input.GetKeyUp(KeyCode.Mouse1) && m_RightCanStartGripTrace)
+            {
+                m_RightDoesGripTraceExist = true;
+                m_RightCanStartGripTrace = false;
+
+                DespawnGrip();
             }
         }
 
@@ -253,7 +277,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position, m_Capsule.radius * (1.0f - advancedSettings.shellOffset), Vector3.down, out hitInfo,
-                                   ((m_Capsule.height/2f) - m_Capsule.radius) +
+                                   ((m_Capsule.height / 2f) - m_Capsule.radius) +
                                    advancedSettings.stickToGroundHelperDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
                 if (Mathf.Abs(Vector3.Angle(hitInfo.normal, Vector3.up)) < 85f)
@@ -266,15 +290,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private Vector2 GetInput()
         {
-            
+
             Vector2 input = new Vector2
-                {
+            {
                 //x = CrossPlatformInputManager.GetAxis("Horizontal"),
                 //y = CrossPlatformInputManager.GetAxis("Vertical")
                 x = Input.GetAxis("Horizontal"),
                 y = Input.GetAxis("Vertical")
             };
-			movementSettings.UpdateDesiredTargetSpeed(input);
+            movementSettings.UpdateDesiredTargetSpeed(input);
             return input;
         }
 
@@ -287,13 +311,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // get the rotation before it's changed
             float oldYRotation = transform.eulerAngles.y;
 
-            mouseLook.LookRotation (transform, cam.transform);
+            mouseLook.LookRotation(transform, cam.transform);
 
             if (m_IsGrounded || advancedSettings.airControl)
             {
                 // Rotate the rigidbody velocity to match the new direction that the character is looking
                 Quaternion velRotation = Quaternion.AngleAxis(transform.eulerAngles.y - oldYRotation, Vector3.up);
-                m_RigidBody.velocity = velRotation*m_RigidBody.velocity;
+                m_RigidBody.velocity = velRotation * m_RigidBody.velocity;
             }
         }
 
@@ -303,7 +327,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_PreviouslyGrounded = m_IsGrounded;
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position, m_Capsule.radius * (1.0f - advancedSettings.shellOffset), Vector3.down, out hitInfo,
-                                   ((m_Capsule.height/2f) - m_Capsule.radius) + advancedSettings.groundCheckDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+                                   ((m_Capsule.height / 2f) - m_Capsule.radius) + advancedSettings.groundCheckDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
                 m_IsGrounded = true;
                 m_GroundContactNormal = hitInfo.normal;
@@ -321,34 +345,65 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void SpawnGrip()
         {
-            float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
-            RaycastHit hitInfoGrip;
-            if(Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+            if (ObjLimit < 5)
             {
-                if(hitInfoGrip.collider.tag == "Wall")
+                float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                RaycastHit hitInfoGrip;
+                if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
                 {
-                    GameObject gripObject = Instantiate(gripPrefab);
-                    gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
-                    gripObject.transform.position = hitInfoGrip.point;
-                    gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
-                }
-                else if(hitInfoGrip.collider.tag == "Grip")
-                {
-                    GameObject jumpPadObject = Instantiate(jumpPrefab);
-                    jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
-                    //jumpPadObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
-                    //jumpPadObject.transform.position = hitInfoGrip.point;
-
-                    if(hitInfoGrip.point.normalized == Vector3.back)
+                    ObjLimit++;
+                    if (hitInfoGrip.collider.tag == "Wall")
                     {
-                        //jumpPadObject.transform.GetChild(0).transform.localRotation;
+                        GameObject gripObject = Instantiate(gripPrefab);
+                        gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                        gripObject.transform.position = hitInfoGrip.point;
+                        gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
                     }
-                    Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
+                    else if (hitInfoGrip.collider.tag == "Grip")
+                    {
+                        GameObject jumpPadObject = Instantiate(jumpPrefab);
+                        jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
+                        //jumpPadObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                        //jumpPadObject.transform.position = hitInfoGrip.point;
+
+                        if (hitInfoGrip.point.normalized == Vector3.back)
+                        {
+                            //jumpPadObject.transform.GetChild(0).transform.localRotation;
+                        }
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
+                    }
                 }
             }
 
-            m_doesGripTraceExist = false;
-            m_canStartGripTrace = true;
+            m_LeftDoesGripTraceExist = false;
+            m_LeftCanStartGripTrace = true;
+        }
+
+        private void DespawnGrip()
+        {
+            if (ObjLimit > 0)
+            {
+                float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                RaycastHit hitInfoGrip;
+                if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+                {
+                    ObjLimit--;
+                    if (hitInfoGrip.collider.tag == "Grip")
+                    {
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject);
+                    }
+                    else if (hitInfoGrip.collider.tag == "JumpPad")
+                    {
+                        GameObject gripObject = Instantiate(gripPrefab);
+                        gripObject.transform.position = hitInfoGrip.collider.transform.position;
+                        
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject);
+                    }
+                }
+            }
+
+            m_RightDoesGripTraceExist = false;
+            m_RightCanStartGripTrace = true;
         }
 
         public void setHang(bool isHang)
