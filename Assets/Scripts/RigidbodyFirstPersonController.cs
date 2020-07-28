@@ -85,7 +85,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public AdvancedSettings advancedSettings = new AdvancedSettings();
 
         public GameObject gripPrefab;  // prefab of the grip object
-        public int ObjLimit = 0;    //Spawn object limiter
+        public int ObjLimit = 0;    //Spawn object limiter (also to be used in Text UI script "ObjLimitScript.cs")
 
         public GameObject jumpPrefab;  // prefab of the jump pad object
 
