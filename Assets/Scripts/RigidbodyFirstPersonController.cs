@@ -145,6 +145,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_Jump = true;
             }
+
         }
 
 
@@ -323,14 +324,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
             RaycastHit hitInfoGrip;
-            if(Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+            if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
             {
                 if(hitInfoGrip.collider.tag == "Wall")
                 {
                     GameObject gripObject = Instantiate(gripPrefab);
-                    gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                    //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                    gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                    gripObject.transform.GetChild(0).transform.localRotation = (hitInfoGrip.collider.transform.rotation);
                     gripObject.transform.position = hitInfoGrip.point;
                     gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+
+                    //Debug.Log(cam.transform.forward);
                 }
                 else if(hitInfoGrip.collider.tag == "Grip")
                 {
@@ -339,10 +344,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     //jumpPadObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
                     //jumpPadObject.transform.position = hitInfoGrip.point;
 
-                    if(hitInfoGrip.point.normalized == Vector3.back)
-                    {
-                        //jumpPadObject.transform.GetChild(0).transform.localRotation;
-                    }
+                    //Debug.Log(hitInfoGrip.point.normalized);
+                    //jumpPadObject.transform.LookAt()
+                    //jumpPadObject.transform.GetChild(0).transform.localRotation = (hitInfoGrip.collider.transform.rotation); //Quaternion.Euler(-90f, 0f, 0f);
+                    
                     Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
                 }
             }
