@@ -17,6 +17,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             public float RunMultiplier = 2.0f;   // Speed when sprinting
 	        public KeyCode RunKey = KeyCode.LeftShift;
             public float JumpForce = 5f;     //30f - default
+            public float jumpForceHangY = 10f;
+            public float jumpForceHangX = 7f;
             public AnimationCurve SlopeCurveModifier = new AnimationCurve(new Keyframe(-90.0f, 1.0f), new Keyframe(0.0f, 1.0f), new Keyframe(90.0f, 0.0f));
             [HideInInspector] public float CurrentTargetSpeed = 8f;
 
@@ -83,7 +85,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public AdvancedSettings advancedSettings = new AdvancedSettings();
 
         public GameObject gripPrefab;  // prefab of the grip object
-
+        public GameObject jumpPrefab;  // prefab of the jump pad object
+        public GameObject dashPrefab;  // prefab of the dash object
+        public int ObjLimit = 0;    //Spawn object limiter (also to be used in Text UI script "ObjLimitScript.cs")
 
         private Rigidbody m_RigidBody;
         private CapsuleCollider m_Capsule;
@@ -93,7 +97,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 
         // variables holding data regarding the grip spawning and sphere cast for the grips
-        private bool m_doesGripTraceExist, m_canStartGripTrace;
+        private bool m_LeftDoesGripTraceExist, m_LeftCanStartGripTrace;
+
+        //Variables holding data regarding the grip despawning and sphere cast for the grips
+        private bool m_RightDoesGripTraceExist, m_RightCanStartGripTrace;
+
         private bool m_isHanging;  // is the player hanging from a grip
 
 
@@ -142,6 +150,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_Jump = true;
             }
+
         }
 
 
@@ -149,6 +158,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             GroundCheck();
             Vector2 input = GetInput();
+            Debug.Log(input);
 
             // if input is detected on the horizontal or vertical axes and the player is on the ground or can move in the air then change the force acting on the rigidbody
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
@@ -193,18 +203,20 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else if (m_isHanging)
             {
-                Vector3 desiredJump = cam.transform.forward + cam.transform.right + cam.transform.up;
+                Vector3 desiredJump = cam.transform.forward + cam.transform.up;
                 desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
 
-                desiredJump.x = desiredJump.x * movementSettings.JumpForce;
-                desiredJump.y = desiredJump.y * movementSettings.JumpForce;
-                desiredJump.z = desiredJump.z * movementSettings.JumpForce;
+                desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
+                desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
+                desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
 
-                if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.JumpForce * movementSettings.JumpForce)) && m_Jump)
+                if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY)) && m_Jump)
                 {
                     m_RigidBody.drag = 0f;
+                    m_RigidBody.useGravity = true;
                     m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
                     m_Jumping = true;
+                    m_isHanging = false;
                 }
             }
             else
@@ -219,19 +231,38 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             // if the left mouse button is pressed down and there is no sphere trace for the grip,
             // allow sphere traces for the grip to start
-            if (Input.GetKeyDown(KeyCode.Mouse0) && !m_doesGripTraceExist)
+            if (Input.GetKeyDown(KeyCode.Mouse0) && (m_LeftDoesGripTraceExist == false))
             {
-                m_canStartGripTrace = true;
+                m_LeftCanStartGripTrace = true;
+                m_LeftDoesGripTraceExist = true;
             }
 
             // if the left mouse button is released and a sphere trace for the grip can start,
             // start the grip trace
-            if(Input.GetKeyUp(KeyCode.Mouse0) && m_canStartGripTrace)
+            if (Input.GetKeyUp(KeyCode.Mouse0) && m_LeftCanStartGripTrace)
             {
-                m_doesGripTraceExist = true;
-                m_canStartGripTrace = false;
+                m_LeftDoesGripTraceExist = true;
+                m_LeftCanStartGripTrace = false;
 
                 SpawnGrip();
+            }
+
+            // if the left mouse button is pressed down and there is no sphere trace for the grip,
+            // allow sphere traces for the grip to start
+            if (Input.GetKeyDown(KeyCode.Mouse1) && (m_RightDoesGripTraceExist == false))
+            {
+                m_RightCanStartGripTrace = true;
+                m_RightDoesGripTraceExist = true;
+            }
+
+            // if the left mouse button is released and a sphere trace for the grip can start,
+            // start the grip trace
+            if (Input.GetKeyUp(KeyCode.Mouse1) && m_RightCanStartGripTrace)
+            {
+                m_RightDoesGripTraceExist = true;
+                m_RightCanStartGripTrace = false;
+
+                DespawnGrip();
             }
         }
 
@@ -315,17 +346,96 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void SpawnGrip()
         {
-            float gripRadius = (gripPrefab.GetComponent<BoxCollider>().size.x / 2);
-            RaycastHit hitInfoGrip;
-            if(Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+            if (ObjLimit < 5)
             {
-                GameObject gripObject = Instantiate(gripPrefab);
-                gripObject.transform.position = hitInfoGrip.point;
+                float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                RaycastHit hitInfoGrip;
+                if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+                {
+                    ObjLimit++;
+                    if (hitInfoGrip.collider.tag == "Wall")
+                    {
+                        GameObject gripObject = Instantiate(gripPrefab);
+                        //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.collider.transform.forward;
+                        gripObject.transform.position = hitInfoGrip.point;
+                        gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+
+                        //Debug.Log(cam.transform.forward);
+                    }
+                    else if (hitInfoGrip.collider.tag == "Grip")
+                    {
+                        GameObject jumpPadObject = Instantiate(jumpPrefab);
+                        jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
+                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
+
+                        jumpPadObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+                    }
+                    else if (hitInfoGrip.collider.tag == "JumpPad")
+                    {
+                        GameObject dashObject = Instantiate(dashPrefab);
+                        dashObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        dashObject.transform.position = hitInfoGrip.collider.transform.position;
+                        dashObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject);
+
+                        dashObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+
+                    }
+                }
             }
 
-            m_doesGripTraceExist = false;
-            m_canStartGripTrace = true;
+            m_LeftDoesGripTraceExist = false;
+            m_LeftCanStartGripTrace = true;
         }
+
+        private void DespawnGrip()
+        {
+            if (ObjLimit > 0)
+            {
+                float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                RaycastHit hitInfoGrip;
+                if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+                {
+                    ObjLimit--;
+                    if (hitInfoGrip.collider.tag == "Grip")
+                    {
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject);
+                    }
+                    else if (hitInfoGrip.collider.tag == "JumpPad")
+                    {
+                        GameObject gripObject = Instantiate(gripPrefab);
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.collider.transform.forward;
+                        gripObject.transform.position = hitInfoGrip.point;
+
+                        gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject);
+                    }
+                    else if(hitInfoGrip.collider.tag == "Dash")
+                    {
+                        GameObject jumpPadObject = Instantiate(jumpPrefab);
+                        jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
+                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+
+                        jumpPadObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+
+                        Destroy(hitInfoGrip.collider.transform.parent.gameObject);
+                    }
+                }
+            }
+
+            m_RightDoesGripTraceExist = false;
+            m_RightCanStartGripTrace = true;
+        }
+
 
         public void setHang(bool isHang)
         {

@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Grip
   - Wall
+  - JumpPad
+  - Dash
+  - DeathFloor
   layers:
   - Default
   - TransparentFX
