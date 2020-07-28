@@ -335,8 +335,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 else if(hitInfoGrip.collider.tag == "Grip")
                 {
                     GameObject jumpPadObject = Instantiate(jumpPrefab);
-                    jumpPadObject.transform.position = hitInfoGrip.point;
-                    Destroy(hitInfoGrip.collider.gameObject);
+                    jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
+                    //jumpPadObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                    //jumpPadObject.transform.position = hitInfoGrip.point;
+
+                    if(hitInfoGrip.point.normalized == Vector3.back)
+                    {
+                        //jumpPadObject.transform.GetChild(0).transform.localRotation;
+                    }
+                    Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
                 }
             }
 

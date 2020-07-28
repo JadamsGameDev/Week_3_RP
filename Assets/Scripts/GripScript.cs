@@ -26,10 +26,11 @@ public class GripScript : MonoBehaviour
         {
             other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
             float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
-            other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight + 0.1f), transform.position.z);
+            other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight + 0.01f), transform.position.z);
             //other.attachedRigidbody.useGravity = false;
             //other.attachedRigidbody.velocity = new Vector3(0f, 0f, 0f);
         }
+    
     }
 
     private void OnTriggerStay(Collider other)
@@ -40,7 +41,7 @@ public class GripScript : MonoBehaviour
             {
                 other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
                 float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
-                other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight + 0.1f), transform.position.z);
+                other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight + 0.01f), transform.position.z);
             }
             else
             {
