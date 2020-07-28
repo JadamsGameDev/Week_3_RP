@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Grip
   - Wall
+  - JumpPad
   layers:
   - Default
   - TransparentFX
