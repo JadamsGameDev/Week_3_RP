@@ -169,7 +169,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 692fbafdd2f92ec479830dee9b2a884b, type: 2}
+  - {fileID: 2100000, guid: c9bc37749e8f61d448ccb0b219b3b069, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -206,7 +206,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 263367484}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0.41, z: 6.7}
+  m_LocalPosition: {x: 0, y: -0.49, z: 6.7}
   m_LocalScale: {x: 10, y: 10, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -261,7 +261,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 692fbafdd2f92ec479830dee9b2a884b, type: 2}
+  - {fileID: 2100000, guid: c9bc37749e8f61d448ccb0b219b3b069, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -609,7 +609,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 692fbafdd2f92ec479830dee9b2a884b, type: 2}
+  - {fileID: 2100000, guid: c9bc37749e8f61d448ccb0b219b3b069, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -883,7 +883,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.53
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -958,19 +958,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1855948326}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81c9795a96c094f4cbde4d65546aa9b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 22f86d0cc3b16024ea7acd69c933f3af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1918388260}
   movementSettings:
-    ForwardSpeed: 8
-    BackwardSpeed: 4
-    StrafeSpeed: 4
+    ForwardSpeed: 2
+    BackwardSpeed: 2
+    StrafeSpeed: 2
     RunMultiplier: 2
     RunKey: 304
     JumpForce: 5
-    jumpForceHangY: 10
-    jumpForceHangX: 10
+    jumpForceHangY: 5
+    jumpForceHangX: 5
     SlopeCurveModifier:
       serializedVersion: 2
       m_Curve:
@@ -1020,9 +1020,11 @@ MonoBehaviour:
     slowDownRate: 20
     airControl: 0
     shellOffset: 0
-  gripPrefab: {fileID: 6689733929751188278, guid: 8db59cd5c9632de45b34f3a71ce3108d,
+  gripPrefab: {fileID: 6689733929751188278, guid: fe61a48de5959134696d33c13d571a96,
     type: 3}
-  jumpPrefab: {fileID: 8141056665097495129, guid: a9370888ab0f02d489723bd6fa8eb027,
+  jumpPrefab: {fileID: 8141056665097495129, guid: 991340fdd4d80ae42835060a9c660b64,
+    type: 3}
+  dashPrefab: {fileID: 122325390966119533, guid: 105ca0e8afb15cd45999db262350b526,
     type: 3}
 --- !u!1 &1918388258
 GameObject:
@@ -1162,7 +1164,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4b269ee2bf49a9e4badedaf4220b65b8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 95338e5a2b637ab40bcf54031d12bada, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

@@ -86,6 +86,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public GameObject gripPrefab;  // prefab of the grip object
         public GameObject jumpPrefab;  // prefab of the jump pad object
+        public GameObject dashPrefab;  // prefab of the dash object
 
 
         private Rigidbody m_RigidBody;
@@ -322,7 +323,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void SpawnGrip()
         {
-            float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+            float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
             RaycastHit hitInfoGrip;
             if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
             {
@@ -331,7 +332,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     GameObject gripObject = Instantiate(gripPrefab);
                     //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
                     gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
-                    gripObject.transform.GetChild(0).transform.localRotation = (hitInfoGrip.collider.transform.rotation);
+                    gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.collider.transform.forward;
                     gripObject.transform.position = hitInfoGrip.point;
                     gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
 
@@ -340,15 +341,25 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 else if(hitInfoGrip.collider.tag == "Grip")
                 {
                     GameObject jumpPadObject = Instantiate(jumpPrefab);
+                    jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
                     jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
-                    //jumpPadObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
-                    //jumpPadObject.transform.position = hitInfoGrip.point;
+                    jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
 
-                    //Debug.Log(hitInfoGrip.point.normalized);
-                    //jumpPadObject.transform.LookAt()
-                    //jumpPadObject.transform.GetChild(0).transform.localRotation = (hitInfoGrip.collider.transform.rotation); //Quaternion.Euler(-90f, 0f, 0f);
-                    
                     Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
+
+                    jumpPadObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+                }
+                else if(hitInfoGrip.collider.tag == "JumpPad")
+                {
+                    GameObject dashObject = Instantiate(dashPrefab);
+                    dashObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                    dashObject.transform.position = hitInfoGrip.collider.transform.position;
+                    dashObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+
+                    Destroy(hitInfoGrip.collider.transform.parent.gameObject);
+
+                    dashObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+
                 }
             }
 

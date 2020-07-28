@@ -5,13 +5,12 @@ using UnityStandardAssets.Characters.FirstPerson;
 
 public class GripScript : MonoBehaviour
 {
-    public GameObject m_JumpPadPrefab;
-    private BoxCollider m_collider;
+    //private BoxCollider m_collider = GetComponent<BoxCollider>();
 
     // Start is called before the first frame update
     void Start()
     {
-        m_collider = GetComponent<BoxCollider>();
+        //m_collider = GetComponent<BoxCollider>();
     }
 
     // Update is called once per frame
@@ -23,41 +22,39 @@ public class GripScript : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
        if(other.tag == "Player")
-        {
+       {
+            GetComponent<BoxCollider>().isTrigger = false;
             other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
             float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
-            other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight + 0.01f), transform.position.z);
+            other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight), transform.position.z);
             //other.attachedRigidbody.useGravity = false;
             other.attachedRigidbody.velocity = new Vector3(0f, 0f, 0f);
-        }
+       }
     
     }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.tag == "Player")
-        {
-            if (other.GetComponent<RigidbodyFirstPersonController>().Jumping == false)
-            {
-                other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
-                float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
-                other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight + 0.01f), transform.position.z);
-            }
-            else
-            {
-                other.GetComponent<RigidbodyFirstPersonController>().setHang(false);
-                //other.GetComponent<RigidbodyFirstPersonController>().
-            }
-        }
-    }
-
 
     private void OnTriggerExit(Collider other)
     {
         if (other.tag == "Player")
         {
+            GetComponent<BoxCollider>().isTrigger = true;
             //other.attachedRigidbody.useGravity = true;
             other.GetComponent<RigidbodyFirstPersonController>().setHang(false);
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.collider.tag == "Player")
+        {
+            if (collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().Jumping == false)
+            {
+                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(true);
+            }
+            else
+            {
+                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(false);
+            }
         }
     }
 }
