@@ -25,7 +25,7 @@ public class GripScript : MonoBehaviour
         {
             other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
             float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
-            other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight), transform.position.z);
+            other.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
             //other.attachedRigidbody.useGravity = false;
             other.attachedRigidbody.velocity = new Vector3(0f, 0f, 0f);
             other.attachedRigidbody.isKinematic = true;
