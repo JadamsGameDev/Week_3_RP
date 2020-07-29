@@ -8,7 +8,9 @@
         _Metallic ("Metallic", Range(0,1)) = 0.0
 		_Emissive("Emissive", 2D) = "white" {}
 		[HDR]_EmissiveColor("EmissiveColor", Color) = (1,1,1,1)
-		_RippleSpeed("Ripple Speed", Range(0,1000)) = 1.0
+		_CellSize("Ripple Size", Range(0,1000)) = 1.0
+		_TimeScale("Time Scale", Range(0,1000)) = 1.0
+		
     }
     SubShader
     {
@@ -35,41 +37,93 @@
 		rand2dTo1d(value, float2(39.346, 11.135))
 	);
 }
+float rand3dTo1d(float3 value, float3 dotDir = float3(12.9898, 78.233, 37.719)) {
+	//make value smaller to avoid artefacts
+	float3 smallValue = sin(value);
+	//get scalar value from 3d vector
+	float random = dot(smallValue, dotDir);
+	//make value more random by making it bigger and then taking the factional part
+	random = frac(sin(random) * 143758.5453);
+	return random;
+}
+		float3 rand3dTo3d(float3 value) {
+	return float3(
+		rand3dTo1d(value, float3(12.989, 78.233, 37.719)),
+		rand3dTo1d(value, float3(39.346, 11.135, 83.155)),
+		rand3dTo1d(value, float3(73.156, 52.235, 09.151))
+	);
+}
 
 		
 
-		float voronoiNoise(float2 value) {
-			float2 baseCell = floor(value);
+float3 voronoiNoise(float3 value) {
+	float3 baseCell = floor(value);
 
-			float minDistToCell = 10;
+	//first pass to find the closest cell
+	float minDistToCell = 10;
+	float3 toClosestCell;
+	float3 closestCell;
+	[unroll]
+	for (int x1 = -1; x1 <= 1; x1++) {
+		[unroll]
+		for (int y1 = -1; y1 <= 1; y1++) {
 			[unroll]
-			for (int x = -1; x <= 1; x++) {
-				[unroll]
-				for (int y = -1; y <= 1; y++) {
-					float2 cell = baseCell + float2(x, y);
-					float2 cellPosition = cell + rand2dTo2d(cell);
-					float2 toCell = cellPosition - value;
-					float distToCell = length(toCell);
-					if (distToCell < minDistToCell) {
-							minDistToCell = distToCell;
-					}
+			for (int z1 = -1; z1 <= 1; z1++) {
+				float3 cell = baseCell + float3(x1, y1, z1);
+				float3 cellPosition = cell + rand3dTo3d(cell);
+				float3 toCell = cellPosition - value;
+				float distToCell = length(toCell);
+				if (distToCell < minDistToCell) {
+					minDistToCell = distToCell;
+					closestCell = cell;
+					toClosestCell = toCell;
 				}
 			}
-			return minDistToCell;
 		}
+	}
+
+	//second pass to find the distance to the closest edge
+	float minEdgeDistance = 10;
+	[unroll]
+	for (int x2 = -1; x2 <= 1; x2++) {
+		[unroll]
+		for (int y2 = -1; y2 <= 1; y2++) {
+			[unroll]
+			for (int z2 = -1; z2 <= 1; z2++) {
+				float3 cell = baseCell + float3(x2, y2, z2);
+				float3 cellPosition = cell + rand3dTo3d(cell);
+				float3 toCell = cellPosition - value;
+
+				float3 diffToClosestCell = abs(closestCell - cell);
+				bool isClosestCell = diffToClosestCell.x + diffToClosestCell.y + diffToClosestCell.z < 0.1;
+				if (!isClosestCell) {
+					float3 toCenter = (toClosestCell + toCell) * 0.5;
+					float3 cellDifference = normalize(toCell - toClosestCell);
+					float edgeDistance = dot(toCenter, cellDifference);
+					minEdgeDistance = min(minEdgeDistance, edgeDistance);
+				}
+			}
+		}
+	}
+
+	float random = rand3dTo1d(closestCell);
+	return float3(minDistToCell, random, minEdgeDistance);
+}
 
         sampler2D _MainTex;
 
         struct Input
         {
             float2 uv_MainTex;
+			float3 worldPos;
         };
 		fixed4 _EmissiveColor;
         half _Glossiness;
         half _Metallic;
         fixed4 _Color;
 		sampler2D _Emissive;
-
+		float _CellSize;
+		float _TimeScale;
 		float _RippleSpeed;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
@@ -82,14 +136,13 @@
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
 			////////////////////////// uvs
-			float rippleSpeed = _RippleSpeed * Time.x;
+			float3 value = IN.worldPos.xyz / _CellSize;
+			value.y += _Time.y * _TimeScale;
+			
+			float3 noise = voronoiNoise(value);
 
-			float2 varoInput;
+			
 
-			varoInput.x = rippleSpeed;
-			varoInput.y = 1;
-
-			float varonoi = voronoiNoise(varoInput);
 
 
 
@@ -102,16 +155,15 @@
 
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			fixed4 e = tex2D (_Emissive, IN.uv_MainTex) * _EmissiveColor;
+			float n = noise.r + _EmissiveColor.a;
+			fixed4 e = tex2D (_Emissive, IN.uv_MainTex) * _EmissiveColor * n;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Alpha = _EmissiveColor.a;
-			e.r = varonoi;
-			e.g = varonoi;
-			e.b = varonoi;
-			o.Emission = e.rgb;
+            o.Alpha = n;
+			
+			o.Emission = e;
 			
         }
         ENDCG
