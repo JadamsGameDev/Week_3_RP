@@ -1,8 +1,15 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Meshes/Walls/WallParts.mat.meta
 guid: 04111db142084fb4ead3d7fa59219267
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
+=======
+guid: c1cbaf539fd0c6347a5ed6ae866be9ea
+folderAsset: yes
+DefaultImporter:
+  externalObjects: {}
+>>>>>>> 5261a6bb4cd11f1540252d17f3d0a045a09da6ba:Assets/U.I/Buttons.meta
   userData: 
   assetBundleName: 
   assetBundleVariant: 
