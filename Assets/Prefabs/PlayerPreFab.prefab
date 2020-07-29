@@ -204,7 +204,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3437871919198888492}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22f86d0cc3b16024ea7acd69c933f3af, type: 3}
+  m_Script: {fileID: 11500000, guid: 314c2f3029141094faf9dd20ed93cdfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 7453425552361805285}
@@ -215,6 +215,8 @@ MonoBehaviour:
     RunMultiplier: 2
     RunKey: 304
     JumpForce: 5
+    jumpForceHangY: 10
+    jumpForceHangX: 7
     SlopeCurveModifier:
       serializedVersion: 2
       m_Curve:
@@ -264,5 +266,8 @@ MonoBehaviour:
     slowDownRate: 20
     airControl: 0
     shellOffset: 0
-  gripPrefab: {fileID: 6689733929751188278, guid: afbdc143040794b4dac4c852243c2ae5,
+  gripPrefab: {fileID: 6689733929751188278, guid: 11f4445ccd2fa4e47ad6cd7161690795,
+    type: 3}
+  ObjLimit: 0
+  jumpPrefab: {fileID: 8141056665097495129, guid: b43d701bb1a9afb4eb4ac6101343bc8e,
     type: 3}
