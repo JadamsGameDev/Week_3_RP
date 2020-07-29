@@ -151,6 +151,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Jump = true;
             }
 
+            Debug.Log(ObjLimit);
+
         }
 
 
@@ -158,7 +160,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             GroundCheck();
             Vector2 input = GetInput();
-            Debug.Log(input);
 
             // if input is detected on the horizontal or vertical axes and the player is on the ground or can move in the air then change the force acting on the rigidbody
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
@@ -170,23 +171,37 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 // does not exceed the max speed.
 
                 // always move along the camera forward as it is the direction that it being aimed at
-                Vector3 desiredMove = cam.transform.forward*input.y + cam.transform.right*input.x;
+                Vector3 desiredMove = cam.transform.forward * input.y + cam.transform.right * input.x;
                 desiredMove = Vector3.ProjectOnPlane(desiredMove, m_GroundContactNormal).normalized;
 
-                desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed;
-                desiredMove.z = desiredMove.z*movementSettings.CurrentTargetSpeed;
-                desiredMove.y = desiredMove.y*movementSettings.CurrentTargetSpeed;
+                desiredMove.x = desiredMove.x * movementSettings.CurrentTargetSpeed;
+                desiredMove.z = desiredMove.z * movementSettings.CurrentTargetSpeed;
+                desiredMove.y = desiredMove.y * movementSettings.CurrentTargetSpeed;
                 if (m_RigidBody.velocity.sqrMagnitude <
-                    (movementSettings.CurrentTargetSpeed*movementSettings.CurrentTargetSpeed))
+                    (movementSettings.CurrentTargetSpeed * movementSettings.CurrentTargetSpeed))
                 {
-                    m_RigidBody.AddForce(desiredMove*SlopeMultiplier(), ForceMode.Impulse);
+                    m_RigidBody.AddForce(desiredMove * SlopeMultiplier(), ForceMode.Impulse);
+                }
+            }
+            else if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (m_isHanging))
+            {
+                Vector3 desiredMove = cam.transform.forward * input.y + cam.transform.right * input.x;
+                transform.Translate(desiredMove * movementSettings.CurrentTargetSpeed * Time.deltaTime);
+
+                if(m_Jump)
+                {
+                    m_RigidBody.isKinematic = false;
+                    m_RigidBody.drag = 0f;
+                    m_RigidBody.velocity = new Vector3(desiredMove.x * movementSettings.CurrentTargetSpeed, 0f, desiredMove.z * movementSettings.CurrentTargetSpeed);
+                    m_RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
+                    m_Jumping = true;
                 }
             }
 
             // if the player is on the ground, a drag force is applied, if not, the drag force is removed
             if (m_IsGrounded)
             {
-                m_RigidBody.drag = 5f;
+                m_RigidBody.drag = 7f;
 
                 if (m_Jump)
                 {
@@ -203,21 +218,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else if (m_isHanging)
             {
-                Vector3 desiredJump = cam.transform.forward + cam.transform.up;
-                desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
+                //Vector3 desiredJump = cam.transform.forward + cam.transform.up;
+                //desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
 
-                desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
-                desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
-                desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
+                //desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
+                //desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
+                //desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
 
-                if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY)) && m_Jump)
-                {
-                    m_RigidBody.drag = 0f;
-                    m_RigidBody.useGravity = true;
-                    m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
-                    m_Jumping = true;
-                    m_isHanging = false;
-                }
+                //if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY)) && m_Jump)
+                //{
+                //    m_RigidBody.drag = 0f;
+                //    m_RigidBody.useGravity = true;
+                //    m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
+                //    m_Jumping = true;
+                //    m_isHanging = false;
+                //}
             }
             else
             {
@@ -348,7 +363,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             if (ObjLimit < 5)
             {
-                float gripRadius = (gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                float gripRadius = 0.25f;//(gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
                 RaycastHit hitInfoGrip;
                 if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
                 {
@@ -357,19 +372,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
                         //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
-                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
-                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.collider.transform.forward;
-                        gripObject.transform.position = hitInfoGrip.point;
+                        gripObject.transform.forward = hitInfoGrip.normal;
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
+                        gripObject.transform.position = hitInfoGrip.point + hitInfoGrip.normal;
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
-
                         //Debug.Log(cam.transform.forward);
                     }
                     else if (hitInfoGrip.collider.tag == "Grip")
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
-                        jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        //jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        jumpPadObject.transform.up = hitInfoGrip.normal;
                         jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
-                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject); //hitInfoGrip.collider.gameObject);
 
@@ -378,9 +393,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject dashObject = Instantiate(dashPrefab);
-                        dashObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        dashObject.transform.up = hitInfoGrip.normal;
                         dashObject.transform.position = hitInfoGrip.collider.transform.position;
-                        dashObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        dashObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
 
@@ -410,9 +425,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
-                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
-                        gripObject.transform.GetChild(0).transform.forward = hitInfoGrip.collider.transform.forward;
-                        gripObject.transform.position = hitInfoGrip.point;
+                        gripObject.transform.forward = hitInfoGrip.normal;
+                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
+                        gripObject.transform.position = hitInfoGrip.point + hitInfoGrip.normal;
 
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
 
@@ -421,9 +436,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if(hitInfoGrip.collider.tag == "Dash")
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
-                        jumpPadObject.transform.forward = hitInfoGrip.collider.transform.forward;
+                        jumpPadObject.transform.up = hitInfoGrip.normal;
                         jumpPadObject.transform.position = hitInfoGrip.collider.transform.position;
-                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.collider.transform.forward * 0.5f);
+                        jumpPadObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
 
                         jumpPadObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
 
@@ -440,6 +455,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public void setHang(bool isHang)
         {
             m_isHanging = isHang;
+
+            m_RigidBody.isKinematic = ((m_isHanging == true) ? true : false);
 
             // if hanging, set location to point of collision
             // above is done in grip script
