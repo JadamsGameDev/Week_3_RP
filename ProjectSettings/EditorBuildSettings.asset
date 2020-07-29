@@ -17,13 +17,22 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/Persistant_1.unity
-    guid: 4244fb4047df07e4485b8ca12ddf9f01
+    guid: 40511970e002dbe4298b8efb52a730dc
   - enabled: 1
     path: Assets/Scenes/Level1/Mechanics.unity
-    guid: 0dfb5ab4278c19c4780ec79210a4b135
+    guid: cd8a1ed5b9ad3204895cbeda580feaed
   - enabled: 1
     path: Assets/Scenes/Level1/Zane.unity
-    guid: 5b8892a2b1beb1244a99fdd23d8d8d5a
+    guid: e9e58dae13d3f4d4f9b8546e12ffcd0e
   m_configObjects: {}
