@@ -16,21 +16,22 @@ public class GripScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
-       if(other.tag == "Player")
-       {
-            GetComponent<BoxCollider>().isTrigger = false;
+        if (other.tag == "Player")
+        {
             other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
             float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
             other.transform.position = new Vector3(transform.position.x, (transform.position.y + halfHeight), transform.position.z);
             //other.attachedRigidbody.useGravity = false;
             other.attachedRigidbody.velocity = new Vector3(0f, 0f, 0f);
-       }
-    
+            other.attachedRigidbody.isKinematic = true;
+            GetComponent<BoxCollider>().isTrigger = false;
+        }
+
     }
 
     private void OnTriggerExit(Collider other)
@@ -40,21 +41,38 @@ public class GripScript : MonoBehaviour
             GetComponent<BoxCollider>().isTrigger = true;
             //other.attachedRigidbody.useGravity = true;
             other.GetComponent<RigidbodyFirstPersonController>().setHang(false);
-        }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.collider.tag == "Player")
-        {
-            if (collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().Jumping == false)
-            {
-                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(true);
-            }
-            else
-            {
-                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(false);
-            }
+            other.attachedRigidbody.isKinematic = false;
         }
     }
 }
+
+//    private void OnCollisionEnter(Collision collision)
+//    {
+//        if (collision.gameObject.tag == "Player")  //(collision.collider.tag == "Player")
+//        {
+//            if (collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().Jumping == false)
+//            {
+//                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(true);
+//            }
+//            else
+//            {
+//                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(false);
+//            }
+//        }
+//    }
+
+//    private void OnCollisionStay(Collision collision)
+//    {
+//        if (collision.gameObject.tag == "Player") //(collision.collider.tag == "Player")
+//        {
+//            if (collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().Jumping == false)
+//            {
+//                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(true);
+//            }
+//            else
+//            {
+//                collision.collider.gameObject.GetComponent<RigidbodyFirstPersonController>().setHang(false);
+//            }
+//        }
+//    }
+//}

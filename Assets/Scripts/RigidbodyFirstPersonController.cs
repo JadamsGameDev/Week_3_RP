@@ -171,16 +171,30 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 // does not exceed the max speed.
 
                 // always move along the camera forward as it is the direction that it being aimed at
-                Vector3 desiredMove = cam.transform.forward*input.y + cam.transform.right*input.x;
+                Vector3 desiredMove = cam.transform.forward * input.y + cam.transform.right * input.x;
                 desiredMove = Vector3.ProjectOnPlane(desiredMove, m_GroundContactNormal).normalized;
 
-                desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed;
-                desiredMove.z = desiredMove.z*movementSettings.CurrentTargetSpeed;
-                desiredMove.y = desiredMove.y*movementSettings.CurrentTargetSpeed;
+                desiredMove.x = desiredMove.x * movementSettings.CurrentTargetSpeed;
+                desiredMove.z = desiredMove.z * movementSettings.CurrentTargetSpeed;
+                desiredMove.y = desiredMove.y * movementSettings.CurrentTargetSpeed;
                 if (m_RigidBody.velocity.sqrMagnitude <
-                    (movementSettings.CurrentTargetSpeed*movementSettings.CurrentTargetSpeed))
+                    (movementSettings.CurrentTargetSpeed * movementSettings.CurrentTargetSpeed))
                 {
-                    m_RigidBody.AddForce(desiredMove*SlopeMultiplier(), ForceMode.Impulse);
+                    m_RigidBody.AddForce(desiredMove * SlopeMultiplier(), ForceMode.Impulse);
+                }
+            }
+            else if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (m_isHanging))
+            {
+                Vector3 desiredMove = cam.transform.forward * input.y + cam.transform.right * input.x;
+                transform.Translate(desiredMove * movementSettings.CurrentTargetSpeed * Time.deltaTime);
+
+                if(m_Jump)
+                {
+                    m_RigidBody.isKinematic = false;
+                    m_RigidBody.drag = 0f;
+                    m_RigidBody.velocity = new Vector3(desiredMove.x * movementSettings.CurrentTargetSpeed, 0f, desiredMove.z * movementSettings.CurrentTargetSpeed);
+                    m_RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
+                    m_Jumping = true;
                 }
             }
 
@@ -204,21 +218,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else if (m_isHanging)
             {
-                Vector3 desiredJump = cam.transform.forward + cam.transform.up;
-                desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
+                //Vector3 desiredJump = cam.transform.forward + cam.transform.up;
+                //desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
 
-                desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
-                desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
-                desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
+                //desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
+                //desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
+                //desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
 
-                if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY)) && m_Jump)
-                {
-                    m_RigidBody.drag = 0f;
-                    m_RigidBody.useGravity = true;
-                    m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
-                    m_Jumping = true;
-                    m_isHanging = false;
-                }
+                //if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY)) && m_Jump)
+                //{
+                //    m_RigidBody.drag = 0f;
+                //    m_RigidBody.useGravity = true;
+                //    m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
+                //    m_Jumping = true;
+                //    m_isHanging = false;
+                //}
             }
             else
             {
@@ -441,6 +455,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public void setHang(bool isHang)
         {
             m_isHanging = isHang;
+
+            m_RigidBody.isKinematic = ((m_isHanging == true) ? true : false);
 
             // if hanging, set location to point of collision
             // above is done in grip script
