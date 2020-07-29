@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 //using UnityStandardAssets.CrossPlatformInput;
 
@@ -70,7 +71,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [Serializable]
         public class AdvancedSettings
         {
-            public float groundCheckDistance = 0.01f; // distance for checking if the controller is grounded ( 0.01f seems to work best for this )
+            public float groundCheckDistance = 0.05f; // distance for checking if the controller is grounded ( 0.01f seems to work best for this )
             public float stickToGroundHelperDistance = 0.5f; // stops the character
             public float slowDownRate = 20f; // rate at which the controller comes to a stop when there is no input
             public bool airControl; // can the user control the direction that is being moved in the air
@@ -88,8 +89,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public GameObject jumpPrefab;  // prefab of the jump pad object
         public GameObject dashPrefab;  // prefab of the dash object
         public int ObjLimit = 0;    //Spawn object limiter (also to be used in Text UI script "ObjLimitScript.cs")
+        public float distance;
+
+        public static BoxCollider boxCollider;
 
         private Rigidbody m_RigidBody;
+        [SerializeField]
         private CapsuleCollider m_Capsule;
         private float m_YRotation;
         private Vector3 m_GroundContactNormal;
@@ -151,8 +156,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Jump = true;
             }
 
-            Debug.Log(ObjLimit);
-
         }
 
 
@@ -183,20 +186,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     m_RigidBody.AddForce(desiredMove * SlopeMultiplier(), ForceMode.Impulse);
                 }
             }
-            else if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (m_isHanging))
-            {
-                Vector3 desiredMove = cam.transform.forward * input.y + cam.transform.right * input.x;
-                transform.Translate(desiredMove * movementSettings.CurrentTargetSpeed * Time.deltaTime);
-
-                if(m_Jump)
-                {
-                    m_RigidBody.isKinematic = false;
-                    m_RigidBody.drag = 0f;
-                    m_RigidBody.velocity = new Vector3(desiredMove.x * movementSettings.CurrentTargetSpeed, 0f, desiredMove.z * movementSettings.CurrentTargetSpeed);
-                    m_RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
-                    m_Jumping = true;
-                }
-            }
+            
 
             // if the player is on the ground, a drag force is applied, if not, the drag force is removed
             if (m_IsGrounded)
@@ -216,24 +206,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     m_RigidBody.Sleep();
                 }
             }
-            else if (m_isHanging)
-            {
-                //Vector3 desiredJump = cam.transform.forward + cam.transform.up;
-                //desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
-
-                //desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
-                //desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
-                //desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
-
-                //if ((m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY)) && m_Jump)
-                //{
-                //    m_RigidBody.drag = 0f;
-                //    m_RigidBody.useGravity = true;
-                //    m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
-                //    m_Jumping = true;
-                //    m_isHanging = false;
-                //}
-            }
             else
             {
                 m_RigidBody.drag = 0f;
@@ -242,6 +214,41 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     StickToGroundHelper();
                 }
             }
+
+            if (m_isHanging)
+            {
+                m_RigidBody.isKinematic = true;
+
+                Vector3 desiredJump = cam.transform.forward + cam.transform.up;
+                desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
+
+                desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
+                desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
+                desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
+
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    m_RigidBody.isKinematic = false;
+                    StartCoroutine(waitToTurnOnCollider());
+
+                    if (m_RigidBody.velocity.sqrMagnitude < (movementSettings.jumpForceHangX * movementSettings.jumpForceHangY))
+                    {
+                        if(boxCollider != null)
+                        {
+                            boxCollider.enabled = false;
+                        }
+                        
+                        setHang(false);
+
+                        m_RigidBody.drag = 0f;
+                        m_RigidBody.useGravity = true;
+                        m_RigidBody.AddForce(desiredJump, ForceMode.Impulse);
+                        m_Jumping = true;
+                        m_isHanging = false;
+                    }
+                }
+            }
+
             m_Jump = false;
 
             // if the left mouse button is pressed down and there is no sphere trace for the grip,
@@ -341,9 +348,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void GroundCheck()
         {
             m_PreviouslyGrounded = m_IsGrounded;
+            //Debug.DrawRay(transform.position, Vector3.down, Color.blue);
+            Debug.DrawLine(transform.position, transform.position - new Vector3(0f, distance, 0f), Color.green);
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position, m_Capsule.radius * (1.0f - advancedSettings.shellOffset), Vector3.down, out hitInfo,
-                                   ((m_Capsule.height/2f) - m_Capsule.radius) + advancedSettings.groundCheckDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+                                   ((m_Capsule.height/2f) + 0.1f) + advancedSettings.groundCheckDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
 
                 m_IsGrounded = true;
@@ -354,20 +363,32 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_IsGrounded = false;
                 m_GroundContactNormal = Vector3.up;
+
+                //if(m_isHanging == false)
+                //{
+                //    m_Jumping = true;
+                //}
+                //else if(m_Jumping == false)
+                //{
+                //    m_isHanging = true;
+                //}
             }
             if (!m_PreviouslyGrounded && (m_IsGrounded || m_isHanging) && m_Jumping)
             {
                 m_Jumping = false;
             }
+
+            //print(hitInfo);
         }
 
         private void SpawnGrip()
         {
             if (ObjLimit < 5)
             {
-                float gripRadius = 0.5f;//(gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                //float gripRadius = 0.5f;//(gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 4); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
                 RaycastHit hitInfoGrip;
-                if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+                //if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+                if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hitInfoGrip, 1000f))
                 {
                     if(hitInfoGrip.collider.tag != "DeathFloor")
                     {
@@ -385,7 +406,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "Grip")
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
-                        jumpPadObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
+                        jumpPadObject.transform.position = hitInfoGrip.point;
                         jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
@@ -395,7 +416,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject dashObject = Instantiate(dashPrefab);
-                        dashObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
+                        dashObject.transform.position = hitInfoGrip.point;
                         dashObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
@@ -459,10 +480,31 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_isHanging = isHang;
 
-            m_RigidBody.isKinematic = ((m_isHanging == true) ? true : false);
+            //if (m_isHanging == true)
+            //{
+            //    m_RigidBody.isKinematic = true;
+            //}
+            //else
+            //{
+            //    m_RigidBody.isKinematic = false;
+            //}
+                //m_RigidBody.isKinematic = ((m_isHanging == true) ? true : false);
 
             // if hanging, set location to point of collision
             // above is done in grip script
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(transform.position, m_Capsule.radius * (1.0f - advancedSettings.shellOffset));
+        }
+
+        IEnumerator waitToTurnOnCollider()
+        {
+            BoxCollider box = boxCollider;
+            yield return new WaitForSeconds(1.0f);
+            box.enabled = true;
         }
     }
 }

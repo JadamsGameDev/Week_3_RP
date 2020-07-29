@@ -24,25 +24,33 @@ public class GripScript : MonoBehaviour
         if (other.tag == "Player")
         {
             other.GetComponent<RigidbodyFirstPersonController>().setHang(true);
-            float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
-            other.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-            //other.attachedRigidbody.useGravity = false;
-            other.attachedRigidbody.velocity = new Vector3(0f, 0f, 0f);
-            other.attachedRigidbody.isKinematic = true;
-            GetComponent<BoxCollider>().isTrigger = false;
+            //float halfHeight = (other.GetComponent<CapsuleCollider>().height / 2f);
+            other.transform.position = transform.GetChild(4).transform.position; //new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            RigidbodyFirstPersonController.boxCollider = GetComponent<BoxCollider>();
+
         }
 
     }
 
-    private void OnTriggerExit(Collider other)
+    //private void OnTriggerExit(Collider other)
+    //{
+    //    if (other.tag == "Player")
+    //    {
+    //        print("TriggerExit");
+
+    //        GetComponent<BoxCollider>().enabled = false;
+    //        other.GetComponent<RigidbodyFirstPersonController>().setHang(false);
+
+    //        StartCoroutine(waitToTurnOnCollider());
+
+            
+    //    }
+    //}
+
+    IEnumerator waitToTurnOnCollider()
     {
-        if (other.tag == "Player")
-        {
-            GetComponent<BoxCollider>().isTrigger = true;
-            //other.attachedRigidbody.useGravity = true;
-            other.GetComponent<RigidbodyFirstPersonController>().setHang(false);
-            other.attachedRigidbody.isKinematic = false;
-        }
+        yield return new WaitForSeconds(1.0f);
+        GetComponent<BoxCollider>().enabled = true;
     }
 }
 

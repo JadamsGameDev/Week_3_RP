@@ -193,9 +193,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5592782
-  m_Height: 1.7363011
+  m_Height: 1.7776011
   m_Direction: 1
-  m_Center: {x: 0, y: -0.13184947, z: 0.029278219}
+  m_Center: {x: 0, y: -0.1524995, z: 0.029278219}
 --- !u!54 &1547468697733123672
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -221,7 +221,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1547468697733123673}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac7db06dadd66d545bb00d2169bfb430, type: 3}
+  m_Script: {fileID: 11500000, guid: 81c9795a96c094f4cbde4d65546aa9b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1547468697804505179}
@@ -283,11 +283,11 @@ MonoBehaviour:
     slowDownRate: 20
     airControl: 0
     shellOffset: 0
-  gripPrefab: {fileID: 2254885750808954632, guid: d0341a3f04876ed49a417825c168740d,
+  gripPrefab: {fileID: 2254885750808954632, guid: 8db59cd5c9632de45b34f3a71ce3108d,
     type: 3}
-  jumpPrefab: {fileID: 1246081979605617995, guid: a9b48b0f462153b4ba72b1c3ba0296b9,
+  jumpPrefab: {fileID: 1246081979605617995, guid: a9370888ab0f02d489723bd6fa8eb027,
     type: 3}
-  dashPrefab: {fileID: 4202750653626459322, guid: 5e22b93c7e594f1419e67109be0fda11,
+  dashPrefab: {fileID: 4202750653626459322, guid: b1df3e48f3cd85248bfc140da3ae8f47,
     type: 3}
   ObjLimit: 0
 --- !u!1 &1547468697804505181
