@@ -12,10 +12,4 @@ public class LoadSceneStandalone : MonoBehaviour
         SceneManager.LoadScene("Assets/Scenes/Level1/Zane.unity", LoadSceneMode.Additive);
     }
 #endif
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

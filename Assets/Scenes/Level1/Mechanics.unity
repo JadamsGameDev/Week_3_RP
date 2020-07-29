@@ -325,6 +325,11 @@ PrefabInstance:
       propertyPath: movementSettings.JumpForce
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 1547468697733123667, guid: f8f7e364afed8774cbad1369ad5e1d8a,
+        type: 3}
+      propertyPath: movementSettings.ForwardSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1547468697998487897, guid: f8f7e364afed8774cbad1369ad5e1d8a,
         type: 3}
       propertyPath: m_Sprite

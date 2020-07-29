@@ -27,7 +27,7 @@ public class BounceScript : MonoBehaviour
             //playerVelocity.y = (playerVelocity.y + 1f) * 15f;
             //playerVelocity.z = playerVelocity.z * 5f;
             // (other.GetComponent<Rigidbody>().velocity.z * 1f)
-            other.GetComponent<Rigidbody>().AddForce(new Vector3(0f, 15f, 0f), ForceMode.Impulse);
+            other.GetComponent<Rigidbody>().AddForce(new Vector3(0f, 13f, 0f), ForceMode.Impulse);
         }
     }
 }

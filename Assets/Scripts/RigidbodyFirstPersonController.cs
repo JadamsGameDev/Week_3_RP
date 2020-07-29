@@ -12,14 +12,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [Serializable]
         public class MovementSettings
         {
-            public float ForwardSpeed = 8.0f;   // Speed when walking forward
-            public float BackwardSpeed = 4.0f;  // Speed when walking backwards
-            public float StrafeSpeed = 4.0f;    // Speed when walking sideways
+            public float ForwardSpeed = 5.0f;   // Speed when walking forward
+            public float BackwardSpeed = 5.0f;  // Speed when walking backwards
+            public float StrafeSpeed = 5.0f;    // Speed when walking sideways
             public float RunMultiplier = 2.0f;   // Speed when sprinting
 	        public KeyCode RunKey = KeyCode.LeftShift;
-            public float JumpForce = 5f;     //30f - default
-            public float jumpForceHangY = 10f;
-            public float jumpForceHangX = 7f;
+            public float JumpForce = 7f;     //30f - default
+            public float jumpForceHangY = 5f;
+            public float jumpForceHangX = 15f;
             public AnimationCurve SlopeCurveModifier = new AnimationCurve(new Keyframe(-90.0f, 1.0f), new Keyframe(0.0f, 1.0f), new Keyframe(90.0f, 0.0f));
             [HideInInspector] public float CurrentTargetSpeed = 8f;
 
@@ -191,7 +191,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // if the player is on the ground, a drag force is applied, if not, the drag force is removed
             if (m_IsGrounded)
             {
-                m_RigidBody.drag = 7f;
+                m_RigidBody.drag = 4.5f;
 
                 if (m_Jump)
                 {
@@ -220,9 +220,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_RigidBody.isKinematic = true;
 
                 Vector3 desiredJump = cam.transform.forward + cam.transform.up;
-                desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
+                //desiredJump = Vector3.ProjectOnPlane(desiredJump, m_GroundContactNormal).normalized;
+                //desiredJump.Normalize();
 
-                desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
+                //desiredJump.x = desiredJump.x * movementSettings.jumpForceHangX;
                 desiredJump.y = desiredJump.y * movementSettings.jumpForceHangY;
                 desiredJump.z = desiredJump.z * movementSettings.jumpForceHangX;
 
@@ -406,7 +407,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "Grip")
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
-                        jumpPadObject.transform.position = hitInfoGrip.point;
+                        jumpPadObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
                         jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
@@ -416,7 +417,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     else if (hitInfoGrip.collider.tag == "JumpPad")
                     {
                         GameObject dashObject = Instantiate(dashPrefab);
-                        dashObject.transform.position = hitInfoGrip.point;
+                        dashObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
                         dashObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
@@ -435,9 +436,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             if (ObjLimit > 0)
             {
-                float gripRadius = 0.5f;//(gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
+                //float gripRadius = 0.5f;//(gripPrefab.GetComponentInChildren<BoxCollider>().size.x / 2); // original 2 //gripPrefab.GetComponent<BoxCollider>().size.x / 2);
                 RaycastHit hitInfoGrip;
-                if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+                //if (Physics.SphereCast(cam.transform.position, gripRadius, cam.transform.forward, out hitInfoGrip, 1000))
+                if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hitInfoGrip, 1000f))
                 {
                     if((hitInfoGrip.collider.tag != "Wall") && (hitInfoGrip.collider.tag != "DeathFloor"))
                     {
