@@ -6,15 +6,24 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/LukesScene.unity
-    guid: 3e6a2696021765f409da819bb584e791
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/Persistant_1.unity
-    guid: 40511970e002dbe4298b8efb52a730dc
+    guid: 4244fb4047df07e4485b8ca12ddf9f01
   - enabled: 1
     path: Assets/Scenes/Level1/Mechanics.unity
-    guid: cd8a1ed5b9ad3204895cbeda580feaed
+    guid: 0dfb5ab4278c19c4780ec79210a4b135
   - enabled: 1
     path: Assets/Scenes/Level1/Zane.unity
-    guid: e9e58dae13d3f4d4f9b8546e12ffcd0e
+    guid: 5b8892a2b1beb1244a99fdd23d8d8d5a
   m_configObjects: {}
