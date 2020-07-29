@@ -8,26 +8,22 @@ using UnityEditor.SceneManagement;
 [ExecuteInEditMode]
 public class SceneLoader : MonoBehaviour
 {
-    //public string path;
-    //private AssetBundle loadedAssets;
-   // private string[] scenePaths;
-
+#if UNITY_EDITOR
+    [MenuItem("Open Scenes/Open Scenes")]
     // Start is called before the first frame update
-    void Start()
+    static void OpenScenes()
     {
-        //loadedAssets = AssetBundle.LoadFromFile(path);
-        //scenePaths = loadedAssets.GetAllScenePaths();
-
-        // for(int ele = 0; ele < scenePaths.Length; ele++)
-        //{
-        //SceneManager.LoadScene(scenePaths[ele], LoadSceneMode.Additive);
-        //}
-
         EditorSceneManager.OpenScene("Assets/Scenes/Level1/Mechanics.unity", OpenSceneMode.Additive);
         EditorSceneManager.OpenScene("Assets/Scenes/Level1/Zane.unity", OpenSceneMode.Additive);
+
+
+        //EditorSceneManager.OpenScene("Assets/Scenes/Level1/Mechanics.unity", OpenSceneMode.Additive);
+        //EditorSceneManager.OpenScene("Assets/Scenes/Level1/Zane.unity", OpenSceneMode.Additive);
         //SceneManager.LoadScene("Assets/Scenes/Level1/Mechanics.unity", LoadSceneMode.Additive);
         //SceneManager.LoadScene("Assets/Scenes/Level1/Zane.unity", LoadSceneMode.Additive);
     }
+#endif
+
 
     // Update is called once per frame
     void Update()
