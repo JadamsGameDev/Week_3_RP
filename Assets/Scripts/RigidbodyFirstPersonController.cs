@@ -371,11 +371,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     if (hitInfoGrip.collider.tag == "Wall")
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
-                        //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                        gripObject.transform.position = hitInfoGrip.point;
                         gripObject.transform.up = hitInfoGrip.normal;
-                        gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
-                        gripObject.transform.position = hitInfoGrip.point + hitInfoGrip.normal;
-                        gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
+
+                        //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
+                        //gripObject.transform.up = hitInfoGrip.normal;
+                        //gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
+                        //gripObject.transform.position = hitInfoGrip.point + hitInfoGrip.normal;
+                        //gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
                         //Debug.Log(cam.transform.forward);
                     }
                     else if (hitInfoGrip.collider.tag == "Grip")
