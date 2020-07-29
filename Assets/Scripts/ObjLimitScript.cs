@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 //This script grabs the Object limit variable from the RigidbodyFirstPersonController.cs script
 
-public class ObjLimitScript : MonoBehaviour
+public class ObjLimitScript : UIState
 {
     public Text ObjLimitText;
     public UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController RBController;
@@ -16,8 +16,10 @@ public class ObjLimitScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        if (ObjLimitText == null)
+            return;
         ObjLimitText.text = "Object values: " + RBController.ObjLimit + "/5";
     }
 }
