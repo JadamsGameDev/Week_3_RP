@@ -372,7 +372,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
                         //gripObject.transform.GetChild(0).transform.localPosition = (cam.transform.forward * -0.5f);
-                        gripObject.transform.forward = hitInfoGrip.normal;
+                        gripObject.transform.up = hitInfoGrip.normal;
                         gripObject.transform.GetChild(0).transform.localPosition = (hitInfoGrip.normal * 0.5f);
                         gripObject.transform.position = hitInfoGrip.point + hitInfoGrip.normal;
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
