@@ -11,7 +11,6 @@
 		_CellSize("Ripple Size", Range(0,1000)) = 1.0
 		_TimeScale("Time Scale", Range(0,1000)) = 1.0
 		
-		
     }
     SubShader
     {
