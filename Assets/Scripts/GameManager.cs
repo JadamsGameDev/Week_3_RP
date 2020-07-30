@@ -7,6 +7,7 @@ enum State
 {
     DEFAULT,
     WIN,
+    DEAD,
 };
 
 public class GameManager : MonoBehaviour
@@ -37,6 +38,10 @@ public class GameManager : MonoBehaviour
                 TurnOFf();
                 UIStates[1].gameObject.SetActive(true);
                 break;
+            case State.DEAD:
+                TurnOFf();
+                UIStates[2].gameObject.SetActive(true);
+                break;
             default:
                 break;
         }
@@ -52,6 +57,13 @@ public class GameManager : MonoBehaviour
     public void Win()
     {
         CurrentState = State.WIN;
+
+        SwitchState();
+    }
+
+    public void Dead()
+    {
+        CurrentState = State.DEAD;
 
         SwitchState();
     }
