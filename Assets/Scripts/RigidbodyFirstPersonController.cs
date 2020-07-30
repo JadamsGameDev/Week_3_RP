@@ -400,7 +400,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
                         gripObject.transform.position = hitInfoGrip.point;
-                        gripObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        if(hitInfoGrip.normal.z > 0.5f)
+                        {
+                            gripObject.transform.rotation = Quaternion.LookRotation(Vector3.left, hitInfoGrip.normal);
+                        }
+                        else
+                        {
+                            gripObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        }
+                        
+                        print(hitInfoGrip.collider.gameObject.name);
 
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
                     }
@@ -408,7 +417,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
                         jumpPadObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
-                        jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        if (hitInfoGrip.normal.z > 0.5f)
+                        {
+                            jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.left, hitInfoGrip.normal);
+                        }
+                        else
+                        {
+                            jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        }
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
 
@@ -418,7 +434,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject dashObject = Instantiate(dashPrefab);
                         dashObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
-                        dashObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        if (hitInfoGrip.normal.z > 0.5f)
+                        {
+                            dashObject.transform.rotation = Quaternion.LookRotation(Vector3.left, hitInfoGrip.normal);
+                        }
+                        else
+                        {
+                            dashObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        }
 
                         Destroy(hitInfoGrip.collider.transform.parent.gameObject);
 
@@ -454,7 +477,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject gripObject = Instantiate(gripPrefab);
                         gripObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
-                        gripObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        if (hitInfoGrip.normal.z > 0.5f)
+                        {
+                            gripObject.transform.rotation = Quaternion.LookRotation(Vector3.left, hitInfoGrip.normal);
+                        }
+                        else
+                        {
+                            gripObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        }
 
                         gripObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
 
@@ -464,7 +494,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         GameObject jumpPadObject = Instantiate(jumpPrefab);
                         jumpPadObject.transform.position = hitInfoGrip.collider.gameObject.transform.position;
-                        jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        if (hitInfoGrip.normal.z > 0.5f)
+                        {
+                            jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.left, hitInfoGrip.normal);
+                        }
+                        else
+                        {
+                            jumpPadObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, hitInfoGrip.normal);
+                        }
 
                         jumpPadObject.GetComponentInChildren<BoxCollider>().isTrigger = true;
 
