@@ -192,10 +192,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5592782
-  m_Height: 1.7776011
+  m_Radius: 0.65553874
+  m_Height: 2.0167189
   m_Direction: 1
-  m_Center: {x: 0, y: -0.1524995, z: 0.029278219}
+  m_Center: {x: 0, y: -0.0003567934, z: 0}
 --- !u!54 &1547468697733123672
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -232,8 +232,8 @@ MonoBehaviour:
     RunMultiplier: 2
     RunKey: 304
     JumpForce: 5
-    jumpForceHangY: 10
-    jumpForceHangX: 7
+    jumpForceHangY: 5
+    jumpForceHangX: 15
     SlopeCurveModifier:
       serializedVersion: 2
       m_Curve:
@@ -290,6 +290,8 @@ MonoBehaviour:
   dashPrefab: {fileID: 4202750653626459322, guid: b1df3e48f3cd85248bfc140da3ae8f47,
     type: 3}
   ObjLimit: 0
+  distance: 0
+  m_Capsule: {fileID: 1547468697733123671}
 --- !u!1 &1547468697804505181
 GameObject:
   m_ObjectHideFlags: 0
